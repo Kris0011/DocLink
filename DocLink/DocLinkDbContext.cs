@@ -1,12 +1,12 @@
 using Microsoft.EntityFrameworkCore;
-
-namespace DocLink.Models
+using DocLink.Models;
+namespace DocLink
 {
     public class DocLinkDbContext : DbContext
     {
         public DocLinkDbContext(DbContextOptions<DocLinkDbContext> options) : base(options)
         {
-            
+
         }
         public DbSet<Patient> Patients { get; set; }
         public DbSet<Doctor> Doctors { get; set; }
