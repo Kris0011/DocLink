@@ -1,0 +1,59 @@
+﻿@model DocLink.Models.Doctor
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Add New Doctor</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+
+                        <div class="form-group mb-3">
+                            <label asp-for="FullName" class="form-label"></label>
+                            <input asp-for="FullName" class="form-control" placeholder="Enter doctor's full name" />
+                          <span asp-validation-for="FullName" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Specialization" class="form-label"></label>
+                            <input asp-for="Specialization" class="form-control" placeholder="Enter doctor's specialization" />
+                            <span asp-validation-for="Specialization" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Hospital" class="form-label">Hospital</label>
+                            <select asp-for="Hospital.Id" asp-items="ViewBag.Hospitals" class="form-control">
+                                <option value="">-- Select Hospital --</option>
+                            </select>
+                            <span asp-validation-for="Hospital" class="text-danger"></span>
+                        </div>
+
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <input type="submit" value="Create" class="btn btn-success" />
+                            <a asp-action="Index" class="btn btn-secondary ms-2">Back to List</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+
+
+

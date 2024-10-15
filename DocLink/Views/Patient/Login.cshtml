@@ -1,0 +1,43 @@
+﻿@{
+    Layout = "_Layout"; // Ensure the layout is set correctly
+}
+
+@model DocLink.ViewModel.LoginViewModel
+
+<div class="login-container">
+    <h2>Patient Login</h2>
+    <form asp-action="Login" method="post">
+        <div class="form-group">
+            <label asp-for="Email"></label>
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Password"></label>
+            <input asp-for="Password" type="password" class="form-control" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-primary">Login</button>
+    </form>
+
+    <div class="signup-link">
+        <p>Want to Register as Patient? <a asp-controller="Patient" asp-action="Signup">Sign up</a></p>
+    </div>
+
+    <div class="Login-link">
+        <p>Want to Login as Hospital? <a asp-controller="Hospital" asp-action="Login">Login</a></p>
+    </div>
+
+    <div class="signup-link">
+        <p>Want to Register as Hospital? <a asp-controller="Hospital" asp-action="Signup">Sign up</a></p>
+    </div>
+
+
+
+
+
+
+
+
+    
+</div>

@@ -2,9 +2,8 @@
   "ExpandedNodes": [
     "",
     "\\bin",
-    "\\Migrations",
+    "\\Controllers",
     "\\Models"
   ],
-  "SelectedNode": "\\DocLink.csproj",
   "PreviewInSolutionExplorer": false
 }

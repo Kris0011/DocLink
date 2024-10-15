@@ -15,58 +15,54 @@
         </div>
         <div class="flex-none">
             <ul class="menu menu-horizontal px-1">
-                <li><a asp-area="" class="decoration-0" asp-controller="Home" asp-action="Index" >Home</a></li>
+                <li><a asp-area="" class="decoration-0" asp-controller="Home" asp-action="Index">Home</a></li>
                 <li><a>Doctors</a></li>
                 <li><a>Appointments</a></li>
-                @* <li> *@
-                @*     <details> *@
-                @*         <summary>Parent</summary> *@
-                @*         <ul class="bg-base-100 rounded-t-none p-2"> *@
-                @*             <li><a>Link 1</a></li> *@
-                @*             <li><a>Link 2</a></li> *@
-                @*         </ul> *@
-                @*     </details> *@
-                @* </li> *@
             </ul>
         </div>
         <div class="flex-none gap-2">
-            @* <div class="form-control"> *@
-            @*     <input type="text" placeholder="Search" class="input input-bordered w-24 md:w-auto" /> *@
-            @* </div> *@
             <div class="dropdown dropdown-end">
                 <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
                     <div class="w-10 rounded-full">
-                        <img
-                            alt="Tailwind CSS Navbar component"
-                            src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+                        <img alt="User Avatar"
+                             src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
                     </div>
                 </div>
-                <ul
-                    tabindex="0"
+                <ul tabindex="0"
                     class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
                     <li>
-                        <a class="justify-between">
-                            Profile
-                            <span class="badge">New</span>
-                        </a>
+                        <a class="justify-between">Profile<span class="badge">New</span></a>
                     </li>
                     <li><a>Settings</a></li>
-                    <li><a>Logout</a></li>
+
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <li>
+                            <form asp-controller="Patient" asp-action="Logout" method="post">
+                                <button type="submit" class="btn btn-link">Logout</button>
+                            </form>
+                        </li>
+                    }
+                    else
+                    {
+                        <li><a asp-controller="Patient" asp-action="Login">Login</a></li>
+                    }
                 </ul>
             </div>
         </div>
-    </div>   
-    <div class="">
-        <main  class="pb-3 flex flex-col justify-center items-center">
-            @RenderBody()
-        </main>
     </div>
+
+    <main class="pb-3 flex flex-col justify-center items-center">
+        @RenderBody() <!-- Ensure this is present -->
+    </main>
 
     <footer class="footer footer-center bg-base-300 text-base-content p-4">
         <aside>
-            <p>Developed by Kris Patel and Kavin Shah  © 2024 - DocLink</p>
+            <p>Developed by Kris Patel and Kavin Shah © 2024 - DocLink</p>
         </aside>
     </footer>
+
+    <!-- Include required scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
