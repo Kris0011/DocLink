@@ -1,0 +1,42 @@
+﻿@{
+    Layout = "_Layout";
+}
+
+
+<h2>Book Appointment</h2>
+
+<form asp-action="Search" method="get">
+    <input type="text" name="search" placeholder="Search for doctors..." />
+    <select name="filter">
+        <option value="doctor">Doctor</option>
+        <option value="hospital">Hospital</option>
+    </select>
+    <button type="submit" class="btn btn-primary">Search</button>
+</form>
+
+@if (Model != null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Doctor Name</th>
+                <th>Specialization</th>
+                <th>Hospital</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var doctor in Model.Doctors)
+            {
+                <tr>
+                    <td>@doctor.FullName</td>
+                    <td>@doctor.Specialization</td>
+                    <td>@doctor.Hospital.Name</td>
+                    <td>
+                        <a href="@Url.Action("Book", "Appointment", new { doctorId = doctor.Id })" class="btn btn-success">Book</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

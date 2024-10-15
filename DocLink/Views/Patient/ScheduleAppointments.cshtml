@@ -1,0 +1,18 @@
+﻿@model DocLink.ViewModel.ScheduleAppointmentViewModel
+
+<form asp-action="SearchAppointments" method="post">
+    <div>
+        <label>Select Hospital:</label>
+        <select asp-for="HospitalId" asp-items="ViewBag.Hospitals"></select>
+    </div>
+
+    <div>
+        <label>Select Doctor:</label>
+        <select asp-for="DoctorId" asp-items="ViewBag.Doctors"></select>
+    </div>
+
+    <button type="submit">Search</button>
+</form>
+
+
+

@@ -1,0 +1,10 @@
+﻿@{
+    ViewData["Title"] = "Patient Dashboard";
+}
+
+<h2>Welcome to your Dashboard</h2>
+
+<div>
+    <button onclick="location.href='@Url.Action("PreviousAppointments", "Patient")'">Previous Appointments</button>
+    <button onclick="location.href='@Url.Action("ScheduleAppointment", "Patient")'">Schedule Appointment</button>
+</div>

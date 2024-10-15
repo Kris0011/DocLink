@@ -30,7 +30,23 @@ namespace DocLink
                 .HasOne(a => a.Patient) 
                 .WithMany() 
                 .HasForeignKey(a => a.PatientId)  
-                .OnDelete(DeleteBehavior.Restrict); 
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Appointment>()
+           .HasOne(a => a.Hospital)
+           .WithMany(h => h.Appointments)
+           .HasForeignKey(a => a.HospitalId);
+
+            modelBuilder.Entity<Appointment>()
+                .HasOne(a => a.Doctor)
+                .WithMany(d => d.Appointments)
+                .HasForeignKey(a => a.DoctorId);
+
+            modelBuilder.Entity<Appointment>()
+                .HasOne(a => a.Patient)
+                .WithMany(p => p.Appointments)
+                .HasForeignKey(a => a.PatientId);
+
         }
 
 

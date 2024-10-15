@@ -24,5 +24,6 @@ namespace DocLink.Models
         
 
         public IList<Doctor> Doctors { get; set; }
+        public ICollection<Appointment> Appointments { get; set; }
     }
 }

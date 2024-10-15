@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace DocLink.Controllers
 {
@@ -26,6 +27,46 @@ namespace DocLink.Controllers
         private bool IsUserLoggedIn()
         {
             return HttpContext.Session.GetInt32("PatientId") != null;
+        }
+        public IActionResult Dashboard()
+        {
+            if (!IsUserLoggedIn())
+            {
+                return RedirectToAction("Login");
+            }
+
+            return View();  
+        }
+
+      
+        public async Task<IActionResult> PreviousAppointments()
+        {
+            if (!IsUserLoggedIn())
+            {
+                return RedirectToAction("Login");
+            }
+
+            var patientId = HttpContext.Session.GetInt32("PatientId");
+            var appointments = await _context.Appointments
+                                             .Include(a => a.Doctor)
+                                             .Include(a => a.Hospital)
+                                             .Where(a => a.PatientId == patientId)
+                                             .ToListAsync();
+
+            return View(appointments);  
+        }
+
+      
+        public IActionResult ScheduleAppointment()
+        {
+            if (!IsUserLoggedIn())
+            {
+                return RedirectToAction("Login");
+            }
+
+            ViewBag.Hospitals = new SelectList(_context.Hospitals, "Id", "Name");
+            ViewBag.Doctors = new SelectList(_context.Doctors, "Id", "FullName");
+            return View(); 
         }
 
         public async Task<IActionResult> Index()
@@ -61,16 +102,13 @@ namespace DocLink.Controllers
         {
             if (IsUserLoggedIn())
             {
-                return RedirectToAction("Index", "Patient");
+                return RedirectToAction("Dashboard", "Patient");  
             }
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-       
-       
-
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (ModelState.IsValid)
@@ -80,19 +118,18 @@ namespace DocLink.Controllers
 
                 if (patient != null)
                 {
-                    HttpContext.Session.SetInt32("PatientId", patient.Id); 
+                    HttpContext.Session.SetInt32("PatientId", patient.Id);
 
-                    
                     var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Name, patient.Email),
-            new Claim("PatientId", patient.Id.ToString()) 
-        };
+                    {
+                        new Claim(ClaimTypes.Name, patient.Email),
+                        new Claim("PatientId", patient.Id.ToString())
+                    };
 
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
 
-                    return RedirectToAction("Index", "Patient");
+                    return RedirectToAction("Dashboard", "Patient");  // Redirect to dashboard after login
                 }
                 else
                 {
@@ -100,15 +137,13 @@ namespace DocLink.Controllers
                 }
             }
             return View(model);
-
-
         }
 
         public IActionResult Signup()
         {
             if (IsUserLoggedIn())
             {
-                return RedirectToAction("Index", "Patient");
+                return RedirectToAction("Dashboard", "Patient");
             }
             return View();
         }
@@ -119,7 +154,7 @@ namespace DocLink.Controllers
         {
             if (IsUserLoggedIn())
             {
-                return RedirectToAction("Index", "Patient");
+                return RedirectToAction("Dashboard", "Patient");
             }
 
             if (ModelState.IsValid)
@@ -257,18 +292,51 @@ namespace DocLink.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize] 
-        public IActionResult Logout()
+        [Authorize]
+        public async Task<IActionResult> Logout()
         {
-            HttpContext.SignOutAsync(); 
-
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme); 
             HttpContext.Session.Clear();
-            return RedirectToAction("Login", "Patient"); 
+            return RedirectToAction("Login", "Patient");
         }
 
         private bool PatientExists(int id)
         {
             return _context.Patients.Any(e => e.Id == id);
         }
+
+
+       
+        public IActionResult ScheduleAppointments()
+        {
+            ViewBag.Hospitals = new SelectList(_context.Hospitals, "Id", "Name");
+            ViewBag.Doctors = new SelectList(_context.Doctors, "Id", "FullName");
+
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult SearchAppointments(ScheduleAppointmentViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+               
+                var appointments = _context.Appointments
+                                           .Where(a => a.HospitalId == model.HospitalId && a.DoctorId == model.DoctorId)
+                                           .ToList();
+
+               
+                return View("AppointmentsList", appointments); 
+            }
+
+ 
+            ViewBag.Hospitals = new SelectList(_context.Hospitals, "Id", "Name", model.HospitalId);
+            ViewBag.Doctors = new SelectList(_context.Doctors, "Id", "FullName", model.DoctorId);
+            return View("ScheduleAppointments", model);
+        }
+
+
+
+
     }
 }

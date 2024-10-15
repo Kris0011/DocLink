@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace DocLink.Models
@@ -34,6 +35,9 @@ namespace DocLink.Models
         public string Gender { get; set; }
 
         [Required]
-        public int Age { get; set; } 
+        public int Age { get; set; }
+
+
+        public ICollection<Appointment> Appointments { get; set; }
     }
 }

@@ -1,0 +1,21 @@
+﻿@model IEnumerable<DocLink.Models.Appointment>
+
+<h2>Your Previous Appointments</h2>
+
+<table>
+    <tr>
+        <th>Doctor</th>
+        <th>Hospital</th>
+        <th>Date</th>
+        <th>Status</th>
+    </tr>
+    @foreach (var appointment in Model)
+    {
+        <tr>
+            <td>@appointment.Doctor.FullName</td>
+            <td>@appointment.Hospital.Name</td>
+            <td>@appointment.Date.ToShortDateString()</td>
+            <td>@appointment.Status</td>
+        </tr>
+    }
+</table>
