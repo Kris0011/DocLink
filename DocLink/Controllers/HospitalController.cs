@@ -4,19 +4,37 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DocLink.Models;
 using System.Linq;
+using DocLink.Repository;
+
+
 
 namespace DocLink.Controllers
 {
     public class HospitalController : Controller
     {
         private readonly DocLinkDbContext _context;
+  //      private readonly IAppointmentRepository _appointmentRepository;
 
         public HospitalController(DocLinkDbContext context)
         {
+//            _appointmentRepository = appointmentRepository;
             _context = context;
         }
 
-      
+
+               [HttpPost]
+        public IActionResult AddDoctor(Doctor doctor)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Doctors.Add(doctor);
+                _context.SaveChanges();
+                return RedirectToAction("Index");  
+            }
+            return View("Index");
+        }
+
+
         private bool IsUserLoggedIn()
         {
             return HttpContext.Session.GetString("HospitalEmail") != null;
@@ -79,7 +97,15 @@ namespace DocLink.Controllers
                 return RedirectToAction("Login");
             }
 
-            return View(await _context.Hospitals.ToListAsync());
+            // Fetch Hospital Email from session
+            var hospitalEmail = HttpContext.Session.GetString("HospitalEmail");
+
+            // Fetch the hospital's upcoming appointments from the repository
+            var hospital = await _context.Hospitals.FirstOrDefaultAsync(h => h.Email == hospitalEmail);
+            //var appointments = await _appointmentRepository.GetUpcomingAppointmentsByHospital(hospital.Id);
+
+            // Pass appointments to the view
+            return View();
         }
 
         public async Task<IActionResult> Details(int? id)

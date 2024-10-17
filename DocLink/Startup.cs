@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using System;
+using DocLink.Repository;
 
 namespace DocLink
 {
@@ -23,6 +24,8 @@ namespace DocLink
             
             services.AddControllersWithViews();
             services.AddHttpContextAccessor();
+
+            services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 
 
             services.AddDbContext<DocLinkDbContext>(options =>

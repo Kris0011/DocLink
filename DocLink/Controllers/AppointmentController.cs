@@ -14,18 +14,16 @@ namespace DocLink.Controllers
     {
         private readonly DocLinkDbContext _context;
 
+
         public AppointmentController(DocLinkDbContext context)
         {
             _context = context;
         }
 
-       
-        public async Task<IActionResult> Index()
-        {
-            return View(await _context.Appointments.ToListAsync());
-        }
 
-      
+        
+
+
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)

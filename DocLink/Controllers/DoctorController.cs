@@ -50,14 +50,13 @@ namespace DocLink.Controllers
         }
 
 
-       
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,FullName,Specialization,Hospital")] Doctor doctor, int hospitalId)
         {
             if (ModelState.IsValid)
             {
-             
                 doctor.Hospital = await _context.Hospitals.FindAsync(hospitalId);
 
                 _context.Add(doctor);
@@ -65,13 +64,13 @@ namespace DocLink.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-        
             ViewBag.Hospitals = new SelectList(_context.Hospitals, "Id", "Name");
             return View(doctor);
         }
 
 
-       
+
+
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
