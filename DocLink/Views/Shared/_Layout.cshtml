@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
 </head>
 <body class="text-white bg-[#1D232A]">
+   
     <div class="navbar bg-base-100 flex justify-between items-center">
         <div class="flex-1">
             <a class="btn btn-ghost text-xl">DocLink</a>
@@ -30,13 +31,21 @@
                 </div>
                 <ul tabindex="0"
                     class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
-                    <li>
-                        <a class="justify-between">Profile<span class="badge">New</span></a>
-                    </li>
+                    <li><a class="justify-between">Profile<span class="badge">New</span></a></li>
                     <li><a>Settings</a></li>
 
-                    @if (User.Identity.IsAuthenticated)
+                    @if (HttpContextAccessor.HttpContext.Session.GetString("HospitalEmail") != null)
                     {
+                       
+                        <li>
+                            <form asp-controller="Hospital" asp-action="Logout" method="post">
+                                <button type="submit" class="btn btn-link">Logout</button>
+                            </form>
+                        </li>
+                    }
+                    else if (User.Identity.IsAuthenticated)
+                    {
+                      
                         <li>
                             <form asp-controller="Patient" asp-action="Logout" method="post">
                                 <button type="submit" class="btn btn-link">Logout</button>
@@ -45,24 +54,28 @@
                     }
                     else
                     {
-                        <li><a asp-controller="Patient" asp-action="Login">Login</a></li>
+                      
+                        <li><a asp-controller="Hospital" asp-action="Login">Hospital Login</a></li>
+                        <li><a asp-controller="Patient" asp-action="Login">Patient Login</a></li>
                     }
                 </ul>
             </div>
         </div>
     </div>
 
+   
     <main class="pb-3 flex flex-col justify-center items-center">
-        @RenderBody() <!-- Ensure this is present -->
+        @RenderBody() 
     </main>
 
+    
     <footer class="footer footer-center bg-base-300 text-base-content p-4">
         <aside>
             <p>Developed by Kris Patel and Kavin Shah © 2024 - DocLink</p>
         </aside>
     </footer>
 
-    <!-- Include required scripts -->
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

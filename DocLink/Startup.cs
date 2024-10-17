@@ -22,8 +22,9 @@ namespace DocLink
         {
             
             services.AddControllersWithViews();
+            services.AddHttpContextAccessor();
 
-            
+
             services.AddDbContext<DocLinkDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DocLink")));
 

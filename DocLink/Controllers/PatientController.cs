@@ -129,7 +129,7 @@ namespace DocLink.Controllers
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
 
-                    return RedirectToAction("Dashboard", "Patient");  // Redirect to dashboard after login
+                    return RedirectToAction("Dashboard", "Patient");  
                 }
                 else
                 {
