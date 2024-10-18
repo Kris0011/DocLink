@@ -18,12 +18,15 @@ namespace DocLink.Controllers
     public class HospitalController : Controller
     {
         private readonly DocLinkDbContext _context;
+        
+        private readonly IHospitalRepository _hospitalRepository;
 
 
-        public HospitalController(DocLinkDbContext context)
+        public HospitalController(DocLinkDbContext context , IHospitalRepository hospitalRepository)
         {
 
             _context = context;
+            _hospitalRepository = hospitalRepository;
         }
 
 
@@ -160,17 +163,18 @@ namespace DocLink.Controllers
             {
                 return RedirectToAction("Login");
             }
-
+        
            
             var hospitalEmail = HttpContext.Session.GetString("HospitalEmail");
-
+        
            
             var hospital = await _context.Hospitals.FirstOrDefaultAsync(h => h.Email == hospitalEmail);
            
-
+        
            
             return View();
         }
+        
 
         public async Task<IActionResult> Details(int? id)
         {

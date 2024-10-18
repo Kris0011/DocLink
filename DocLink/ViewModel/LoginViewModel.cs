@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace DocLink.ViewModel
 {
@@ -12,6 +13,10 @@ namespace DocLink.ViewModel
             [Required]
             [DataType(DataType.Password)]
             public string Password { get; set; }
+            
+            [Required]
+            public string Role { get; set; }
+            
         }
     
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -6,10 +7,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using DocLink.Models;
+using DocLink.Repository;
+using DocLink.ViewModel;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 
-
-
-/*
 
 namespace DocLink.Controllers
 {
@@ -17,37 +18,45 @@ namespace DocLink.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IHospitalRepository _hospitalRepository;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger , IHospitalRepository hospitalRepository)
         {
             _logger = logger;
+            _hospitalRepository = hospitalRepository;
         }
 
-        // Route for the Index action
-        [HttpGet("")] // Matches /home or /home/index
-        [HttpGet("index")] // Matches /home/index
+       
+        [HttpGet("")] 
+        [HttpGet("index")] 
         public IActionResult Index()
         {
             return View();
         }
 
-        // Route for the Privacy action
-        [HttpGet("privacy")] // Matches /home/privacy
+        
+        [HttpGet("privacy")]
         public IActionResult Privacy()
         {
             return View();
         }
 
-        // Route for the Error action
-        [HttpGet("error")] // Matches /home/error
+     
+        [HttpGet("error")]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+
+        [HttpGet("home/hospitals")]
+        public IActionResult Hospitals()
+        {
+            IEnumerable<Hospital> hospitals = _hospitalRepository.GetHospitals();
+            return View(hospitals);
+        }
     }
 }
 
 
-
-*/

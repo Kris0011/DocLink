@@ -135,6 +135,7 @@ namespace DocLink.Controllers
 
                     HttpContext.Session.SetInt32("PatientId", patient.Id);  
 
+                    
                     return RedirectToAction("Dashboard", "Patient");
                 }
                 else

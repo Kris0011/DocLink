@@ -14,16 +14,32 @@
    
     <div class="navbar bg-base-100 flex justify-between items-center">
         <div class="flex-1">
-            <a class="btn btn-ghost text-xl">DocLink</a>
+            <a class="text-white text-decoration-none mx-3 text-xl" href="/">DocLink</a>
         </div>
         <div class="flex-none">
             <ul class="menu menu-horizontal px-1">
-                <li><a asp-area="" class="decoration-0" asp-controller="Home" asp-action="Index">Home</a></li>
-                <li><a>Doctors</a></li>
-                <li><a>Appointments</a></li>
+                <li><a asp-area="" class="text-decoration-none text-white" asp-controller="Home" asp-action="Index">Home</a></li>
+                <li><a asp-area="" class="text-decoration-none text-white" asp-controller="Home" asp-action="Index">Doctors</a></li>
+                <li><a asp-area="" class="text-decoration-none text-white" asp-controller="Home" asp-action="Hospitals">Hospitals</a></li>
             </ul>
         </div>
         <div class="flex-none gap-2">
+            @using Microsoft.AspNetCore.Authentication
+            @inject IAuthenticationService authService
+
+            @{
+            // Check if the user is logged in as a hospital or patient
+            var hospitalAuthResult = await authService.AuthenticateAsync(Context, "HospitalCookies");
+            var patientAuthResult = await authService.AuthenticateAsync(Context, "PatientCookies");
+
+            var hospitalClaim = hospitalAuthResult.Principal?.FindFirst("HospitalId");
+            var patientClaim = patientAuthResult.Principal?.FindFirst("PatientId");
+
+            bool isAuthenticated = hospitalClaim != null || patientClaim != null;
+            }
+
+            @if (isAuthenticated)
+            {
             <div class="dropdown dropdown-end">
                 <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
                     <div class="w-10 rounded-full">
@@ -31,56 +47,41 @@
                              src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
                     </div>
                 </div>
+
                 <ul tabindex="0"
                     class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
                     <li><a class="justify-between">Profile<span class="badge">New</span></a></li>
                     <li><a>Settings</a></li>
 
-        
-                    @using Microsoft.AspNetCore.Authentication
-                    @inject IAuthenticationService authService
-
-                    @{
-                        
-                        var hospitalAuthResult = await authService.AuthenticateAsync(Context, "HospitalCookies");
-                        var patientAuthResult = await authService.AuthenticateAsync(Context, "PatientCookies");
-
-                        var hospitalClaim = hospitalAuthResult.Principal?.FindFirst("HospitalId");
-                        var patientClaim = patientAuthResult.Principal?.FindFirst("PatientId");
-                    }
-
                     @if (hospitalClaim != null)
                     {
-                      
-                       @*<p>HospitalId Claim: @(hospitalClaim.Value)</p>*@
-                        <li>
-                            <form asp-controller="Hospital" asp-action="Logout" method="post">
-                                <button type="submit" class="btn btn-link">Logout (Hospital)</button>
-                            </form>
-                        </li>
+                    <li>
+                        <form asp-controller="Hospital" asp-action="Logout" method="post">
+                            <button type="submit" class="btn btn-link">Logout (Hospital)</button>
+                        </form>
+                    </li>
                     }
                     else if (patientClaim != null)
                     {
-                       
- @*                       <p>PatientId Claim: @(patientClaim.Value)</p>*@
-                        <li>
-                            <form asp-controller="Patient" asp-action="Logout" method="post">
-                                <button type="submit" class="btn btn-link">Logout (Patient)</button>
-                            </form>
-                        </li>
+                    <li>
+                        <form asp-controller="Patient" asp-action="Logout" method="post">
+                            <button type="submit" class="btn btn-link">Logout (Patient)</button>
+                        </form>
+                    </li>
                     }
-                    else
-                    {
-                     
-                        <li><a asp-controller="Hospital" asp-action="Login">Hospital Login</a></li>
-                        <li><a asp-controller="Patient" asp-action="Login">Patient Login</a></li>
-                    }
-
-
-
                 </ul>
             </div>
+            }
+            else
+            {
+            <!-- Show login options if not authenticated -->
+            @* <div class="flex gap-2"> *@
+            @*     <a asp-controller="Hospital" asp-action="Login" class="btn btn-primary">Hospital Login</a> *@
+            @*     <a asp-controller="Patient" asp-action="Login" class="btn btn-secondary">Patient Login</a> *@
+            @* </div> *@
+            }
         </div>
+
     </div>
 
    

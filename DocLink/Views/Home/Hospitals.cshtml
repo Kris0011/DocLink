@@ -1,0 +1,19 @@
+@model IEnumerable<Hospital>
+
+<h2 class="text-2xl font-bold mb-6">Hospitals</h2>
+
+<!-- Container for the hospital list -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    @foreach (var hospital in Model)
+    {
+        <div class="p-4 bg-white rounded-lg shadow-md hover:shadow-lg transition duration-300">
+            <h3 class="text-xl font-semibold text-gray-800">@hospital.Name</h3>
+            <p class="text-gray-600 mt-2">@hospital.Address</p>
+         
+            
+            <!-- Optional: Add more details if needed -->
+            <p class="text-gray-600 mt-1">Contact: @hospital.Phone</p>
+            <p class="text-gray-600 mt-1">Email: @hospital.Email</p>
+        </div>
+    }
+</div>
