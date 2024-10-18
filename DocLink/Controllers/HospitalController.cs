@@ -13,11 +13,11 @@ namespace DocLink.Controllers
     public class HospitalController : Controller
     {
         private readonly DocLinkDbContext _context;
-  //      private readonly IAppointmentRepository _appointmentRepository;
+
 
         public HospitalController(DocLinkDbContext context)
         {
-//            _appointmentRepository = appointmentRepository;
+
             _context = context;
         }
 
@@ -25,12 +25,42 @@ namespace DocLink.Controllers
                [HttpPost]
         public IActionResult AddDoctor(Doctor doctor)
         {
-            if (ModelState.IsValid)
+           
+            string hospitalEmail = HttpContext.Session.GetString("HospitalEmail");
+
+            if (!string.IsNullOrEmpty(hospitalEmail))
             {
-                _context.Doctors.Add(doctor);
-                _context.SaveChanges();
-                return RedirectToAction("Index");  
+              
+                var hospital = _context.Hospitals.FirstOrDefault(h => h.Email == hospitalEmail);
+
+                if (hospital != null)
+                {
+                    
+                    doctor.HospitalId = hospital.Id;
+
+                    if (ModelState.IsValid)
+                    {
+                       
+                        _context.Doctors.Add(doctor);
+                        _context.SaveChanges();
+
+                       
+                        return RedirectToAction("Index");
+                    }
+                }
+                else
+                {
+                    
+                    ModelState.AddModelError(string.Empty, "Hospital not found.");
+                }
             }
+            else
+            {
+
+                ModelState.AddModelError(string.Empty, "No hospital email in session.");
+            }
+
+
             return View("Index");
         }
 

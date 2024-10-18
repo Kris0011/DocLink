@@ -17,7 +17,7 @@ namespace DocLink.Models
         public string Specialization { get; set; }
 
         [Required]
-        public string Email {  get; set; }
+        public string DoctorEmail {  get; set; }
 
         [Required]
         public string password { get; set; }

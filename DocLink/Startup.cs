@@ -28,10 +28,15 @@ namespace DocLink
             services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 
 
-            services.AddDbContext<DocLinkDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DocLink")));
+            //    services.AddDbContext<DocLinkDbContext>(options =>
+            //      options.UseSqlServer(Configuration.GetConnectionString("DocLink")));
 
-            
+
+            services.AddDbContext<DocLinkDbContext>(options =>
+           options.UseMySql(Configuration.GetConnectionString("DocLink"),
+           new MySqlServerVersion(new Version(8, 0, 21))));
+
+
             services.AddDistributedMemoryCache();
             services.AddSession(options =>
             {

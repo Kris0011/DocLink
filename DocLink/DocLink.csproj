@@ -22,6 +22,7 @@
         <PrivateAssets>all</PrivateAssets>
       </PackageReference>
       <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.6" />
+      <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.2" />
         <UpToDateCheckBuilt Include="wwwroot/css/site.css" Set="Css" />
         <UpToDateCheckBuilt Include="tailwind.config.js" Set="Css" />
     </ItemGroup>
