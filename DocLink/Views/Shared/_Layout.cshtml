@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿
+
+<!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
     <meta charset="utf-8" />
@@ -34,30 +36,48 @@
                     <li><a class="justify-between">Profile<span class="badge">New</span></a></li>
                     <li><a>Settings</a></li>
 
-                    @if (HttpContextAccessor.HttpContext.Session.GetString("HospitalEmail") != null)
+        
+                    @using Microsoft.AspNetCore.Authentication
+                    @inject IAuthenticationService authService
+
+                    @{
+                        
+                        var hospitalAuthResult = await authService.AuthenticateAsync(Context, "HospitalCookies");
+                        var patientAuthResult = await authService.AuthenticateAsync(Context, "PatientCookies");
+
+                        var hospitalClaim = hospitalAuthResult.Principal?.FindFirst("HospitalId");
+                        var patientClaim = patientAuthResult.Principal?.FindFirst("PatientId");
+                    }
+
+                    @if (hospitalClaim != null)
                     {
-                       
+                      
+                       @*<p>HospitalId Claim: @(hospitalClaim.Value)</p>*@
                         <li>
                             <form asp-controller="Hospital" asp-action="Logout" method="post">
-                                <button type="submit" class="btn btn-link">Logout</button>
+                                <button type="submit" class="btn btn-link">Logout (Hospital)</button>
                             </form>
                         </li>
                     }
-                    else if (User.Identity.IsAuthenticated)
+                    else if (patientClaim != null)
                     {
-                      
+                       
+ @*                       <p>PatientId Claim: @(patientClaim.Value)</p>*@
                         <li>
                             <form asp-controller="Patient" asp-action="Logout" method="post">
-                                <button type="submit" class="btn btn-link">Logout</button>
+                                <button type="submit" class="btn btn-link">Logout (Patient)</button>
                             </form>
                         </li>
                     }
                     else
                     {
-                      
+                     
                         <li><a asp-controller="Hospital" asp-action="Login">Hospital Login</a></li>
                         <li><a asp-controller="Patient" asp-action="Login">Patient Login</a></li>
                     }
+
+
+
                 </ul>
             </div>
         </div>

@@ -69,6 +69,8 @@ namespace DocLink.Controllers
             return View(); 
         }
 
+
+        [Authorize(AuthenticationSchemes = "PatientCookies")]
         public async Task<IActionResult> Index()
         {
             if (!IsUserLoggedIn())
@@ -97,16 +99,15 @@ namespace DocLink.Controllers
 
             return View(patient);
         }
-
+        [HttpGet]
         public IActionResult Login()
         {
             if (IsUserLoggedIn())
             {
-                return RedirectToAction("Dashboard", "Patient");  
+                return RedirectToAction("Dashboard", "Patient");
             }
             return View();
         }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
@@ -118,18 +119,23 @@ namespace DocLink.Controllers
 
                 if (patient != null)
                 {
-                    HttpContext.Session.SetInt32("PatientId", patient.Id);
-
+                   
                     var claims = new List<Claim>
-                    {
-                        new Claim(ClaimTypes.Name, patient.Email),
-                        new Claim("PatientId", patient.Id.ToString())
-                    };
+            {
+                new Claim(ClaimTypes.Name, patient.Email),
+                new Claim("PatientId", patient.Id.ToString())  
+            };
 
-                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+                    var claimsIdentity = new ClaimsIdentity(claims, "PatientCookies");
+                    await HttpContext.SignInAsync("PatientCookies", new ClaimsPrincipal(claimsIdentity));
 
-                    return RedirectToAction("Dashboard", "Patient");  
+
+                    
+                  
+
+                    HttpContext.Session.SetInt32("PatientId", patient.Id);  
+
+                    return RedirectToAction("Dashboard", "Patient");
                 }
                 else
                 {
@@ -138,6 +144,28 @@ namespace DocLink.Controllers
             }
             return View(model);
         }
+
+
+
+
+        
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync("PatientCookies");
+
+          
+            HttpContext.Session.Clear();
+
+          
+            return RedirectToAction("Login");
+        }
+
+
+
+
 
         public IActionResult Signup()
         {
@@ -289,16 +317,7 @@ namespace DocLink.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize]
-        public async Task<IActionResult> Logout()
-        {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme); 
-            HttpContext.Session.Clear();
-            return RedirectToAction("Login", "Patient");
-        }
+       
 
         private bool PatientExists(int id)
         {
@@ -306,36 +325,56 @@ namespace DocLink.Controllers
         }
 
 
-       
-        public IActionResult ScheduleAppointments()
+
+      /*  public IActionResult ScheduleAppointments()
         {
+            var model = new ScheduleAppointmentViewModel();
             ViewBag.Hospitals = new SelectList(_context.Hospitals, "Id", "Name");
             ViewBag.Doctors = new SelectList(_context.Doctors, "Id", "FullName");
 
-            return View();
+            return View(model);
         }
 
         [HttpPost]
         public IActionResult SearchAppointments(ScheduleAppointmentViewModel model)
         {
+            // Initialize DoctorList to prevent null reference
+            model.DoctorList = new List<DoctorViewModel>();
+
             if (ModelState.IsValid)
             {
-               
-                var appointments = _context.Appointments
-                                           .Where(a => a.HospitalId == model.HospitalId && a.DoctorId == model.DoctorId)
-                                           .ToList();
+                // Build the query for doctors based on the hospital and name
+                var doctors = _context.Doctors.AsQueryable();
 
-               
-                return View("AppointmentsList", appointments); 
+                if (model.HospitalId != 0) // Assuming 0 means 'All Hospitals'
+                {
+                    doctors = doctors.Where(d => d.HospitalId == model.HospitalId);
+                }
+
+                // Filtering by DoctorName if it has a value
+                if (!string.IsNullOrEmpty(model.DoctorName))
+                {
+                    doctors = doctors.Where(d => d.FullName.Contains(model.DoctorName));
+                }
+
+                // Populate the DoctorList with the filtered results
+                model.DoctorList = doctors.Select(d => new DoctorViewModel
+                {
+                    Id = d.Id,
+                    Name = d.FullName,
+                    HospitalName = d.Hospital.Name // Ensure this navigation property exists
+                }).ToList();
             }
 
- 
+          
             ViewBag.Hospitals = new SelectList(_context.Hospitals, "Id", "Name", model.HospitalId);
             ViewBag.Doctors = new SelectList(_context.Doctors, "Id", "FullName", model.DoctorId);
+
+          
             return View("ScheduleAppointments", model);
         }
 
-
+        */
 
 
     }

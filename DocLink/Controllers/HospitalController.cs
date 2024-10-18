@@ -5,6 +5,11 @@ using Microsoft.EntityFrameworkCore;
 using DocLink.Models;
 using System.Linq;
 using DocLink.Repository;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using System.Collections.Generic;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 
 
@@ -92,34 +97,63 @@ namespace DocLink.Controllers
             return View(hospital);
         }
 
+       
+
+        [HttpGet]
         public IActionResult Login()
         {
             return View();
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(string email, string password)
+       
+
+
+         [HttpPost]
+         [ValidateAntiForgeryToken]
+         public async Task<IActionResult> Login(string email, string password)
+         {
+             var hospital = await _context.Hospitals
+                 .FirstOrDefaultAsync(h => h.Email == email && h.Password == password);
+
+             if (hospital != null)
+             {
+                 HttpContext.Session.SetString("HospitalEmail", hospital.Email);
+
+                 var claims = new List<Claim>
+         {
+             new Claim(ClaimTypes.Name, hospital.Email),
+             new Claim("HospitalId", hospital.Id.ToString())
+         };
+
+                 var claimsIdentity = new ClaimsIdentity(claims,"HospitalCookies");
+                 await HttpContext.SignInAsync("HospitalCookies", new ClaimsPrincipal(claimsIdentity));
+
+                 return RedirectToAction("Index");
+             }
+
+             ViewBag.ErrorMessage = "Invalid login credentials.";
+             return View();
+         }
+       
+
+      
+
+
+
+        public async Task<IActionResult> Logout()
         {
-            var hospital = await _context.Hospitals
-                .FirstOrDefaultAsync(h => h.Email == email && h.Password == password);
+            // Sign out the user from the authentication scheme
+            await HttpContext.SignOutAsync("HospitalCookies");
 
-            if (hospital != null)
-            {
-                HttpContext.Session.SetString("HospitalEmail", hospital.Email);
-                return RedirectToAction("Index");
-            }
-
-            ViewBag.ErrorMessage = "Invalid login credentials.";
-            return View();
-        }
-
-        public IActionResult Logout()
-        {
+            // Clear the session
             HttpContext.Session.Clear();
+
+            // Redirect to the Login page
             return RedirectToAction("Login");
         }
 
+
+        [Authorize(AuthenticationSchemes = "HospitalCookies")]
         public async Task<IActionResult> Index()
         {
             if (!IsUserLoggedIn())
@@ -127,14 +161,14 @@ namespace DocLink.Controllers
                 return RedirectToAction("Login");
             }
 
-            // Fetch Hospital Email from session
+           
             var hospitalEmail = HttpContext.Session.GetString("HospitalEmail");
 
-            // Fetch the hospital's upcoming appointments from the repository
+           
             var hospital = await _context.Hospitals.FirstOrDefaultAsync(h => h.Email == hospitalEmail);
-            //var appointments = await _appointmentRepository.GetUpcomingAppointmentsByHospital(hospital.Id);
+           
 
-            // Pass appointments to the view
+           
             return View();
         }
 

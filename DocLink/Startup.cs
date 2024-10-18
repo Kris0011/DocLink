@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using System;
 using DocLink.Repository;
+using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
 
 namespace DocLink
 {
@@ -19,43 +21,45 @@ namespace DocLink
 
         public IConfiguration Configuration { get; }
 
+
         public void ConfigureServices(IServiceCollection services)
         {
-            
+
+        
+
+
+            services.AddAuthentication("HospitalCookies")
+                .AddCookie("HospitalCookies", options =>
+                {
+                    options.LoginPath = "/Hospital/Login"; 
+                    options.AccessDeniedPath = "/Home/AccessDenied"; 
+                    options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+                });
+            services.AddAuthentication("PatientCookies")
+               .AddCookie("PatientCookies", options =>
+               {
+                   options.LoginPath = "/Patient/Login";
+                   options.AccessDeniedPath = "/Home/AccessDenied";
+                   options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+               });
+
             services.AddControllersWithViews();
             services.AddHttpContextAccessor();
-
             services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 
-
-            //    services.AddDbContext<DocLinkDbContext>(options =>
-            //      options.UseSqlServer(Configuration.GetConnectionString("DocLink")));
-
-
             services.AddDbContext<DocLinkDbContext>(options =>
-           options.UseMySql(Configuration.GetConnectionString("DocLink"),
-           new MySqlServerVersion(new Version(8, 0, 21))));
-
+                options.UseMySql(Configuration.GetConnectionString("DocLink"), new MySqlServerVersion(new Version(8, 0, 21))));
 
             services.AddDistributedMemoryCache();
             services.AddSession(options =>
             {
-                options.IdleTimeout = TimeSpan.FromMinutes(30); 
-                options.Cookie.HttpOnly = true;                 
-                options.Cookie.IsEssential = true;              
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
             });
-
-           
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(options =>
-                {
-                    options.LoginPath = "/Patient/Login";   
-                    options.AccessDeniedPath = "/Home/AccessDenied"; 
-                    options.ExpireTimeSpan = TimeSpan.FromMinutes(30); 
-                });
-
-            
         }
+
+      
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
@@ -71,23 +75,21 @@ namespace DocLink
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
             app.UseRouting();
-
 
             app.UseSession();
 
-
+      
             app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
-
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Patient}/{action=Login}/{id?}"); 
+                    pattern: "{controller=Patient}/{action=Login}/{id?}");
             });
         }
+
     }
 }

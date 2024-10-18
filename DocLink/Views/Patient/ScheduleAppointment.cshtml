@@ -1,25 +1,36 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿@model DocLink.ViewModel.ScheduleAppointmentViewModel
 
-
-@model DocLink.ViewModel.ScheduleAppointmentViewModel
+<h2>Search for Doctors</h2>
 
 <form asp-action="SearchAppointments" method="post">
     <div>
         <label>Select Hospital:</label>
-        <select asp-for="HospitalId" asp-items="ViewBag.Hospitals"></select>
+        <select asp-for="HospitalId" asp-items="ViewBag.Hospitals">
+            <option value="0">All Hospitals</option> 
+        </select>
     </div>
 
     <div>
-        <label>Select Doctor:</label>
-        <select asp-for="DoctorId" asp-items="ViewBag.Doctors"></select>
+        <label>Search Doctor:</label>
+        <input type="text" asp-for="DoctorName" placeholder="Enter doctor's name" />
     </div>
 
     <button type="submit">Search</button>
 </form>
 
+<hr />
 
-
+@if (Model.DoctorList != null && Model.DoctorList.Any())
+{
+    <h3>Available Doctors</h3>
+    <ul>
+        @foreach (var doctor in Model.DoctorList)
+        {
+            <li>@doctor.Name (@doctor.HospitalName)</li>
+        }
+    </ul>
+}
+else if (Model.DoctorList != null) 
+{
+    <p>No doctors found for the selected hospital and search criteria.</p>
+}

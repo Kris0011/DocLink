@@ -21,7 +21,7 @@ namespace DocLink.Repository
         public async Task<IEnumerable<Appointment>> GetUpcomingAppointmentsByHospital(int hospitalId)
         {
             var upcomingAppointments = await _context.Appointments
-                .Where(a => a.HospitalId == hospitalId && a.Date >= DateTime.Now)  // Fetch only upcoming appointments
+                .Where(a => a.HospitalId == hospitalId && a.Date >= DateTime.Now) 
                 .OrderBy(a => a.Date)  
                 .Include(a => a.Doctor)
                 .Include(a => a.Patient)
