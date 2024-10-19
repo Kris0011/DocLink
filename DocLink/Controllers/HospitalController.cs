@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http; 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using System.Collections.Generic;
 using System.Security.Claims;
+using DocLink.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 
 
@@ -173,6 +175,24 @@ namespace DocLink.Controllers
         
            
             return View();
+        }
+
+        [Authorize(AuthenticationSchemes = "PatientCookies")]
+        [HttpGet("Hospital/{HopitalId}/Doctors")]
+        public IActionResult Doctors(int HopitalId)
+        {
+            IEnumerable<Doctor> doctors = _hospitalRepository.GetDoctorByHospitalId(HopitalId);
+            Console.WriteLine("Inside Doctors");
+
+            for (int i = 0; i < doctors.Count(); i++)
+            {
+                Doctor doctor = doctors.ElementAt(i);
+                Console.WriteLine(doctor.FullName);  
+            }
+            DoctorsViewModel doctorsVM = new DoctorsViewModel();
+            doctorsVM._doctors = doctors;
+            doctorsVM._hospital = _hospitalRepository.GetHospitalById(HopitalId);
+            return View(doctorsVM);
         }
         
 
