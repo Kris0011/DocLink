@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http; 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,8 +10,8 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using System.Collections.Generic;
 using System.Security.Claims;
+using DocLink.ViewModel;
 using Microsoft.AspNetCore.Authorization;
-using System;
 
 
 
@@ -146,12 +147,13 @@ namespace DocLink.Controllers
 
         public async Task<IActionResult> Logout()
         {
-           
+            // Sign out the user from the authentication scheme
             await HttpContext.SignOutAsync("HospitalCookies");
 
+            // Clear the session
             HttpContext.Session.Clear();
 
-          
+            // Redirect to the Login page
             return RedirectToAction("Login");
         }
 
@@ -163,31 +165,36 @@ namespace DocLink.Controllers
             {
                 return RedirectToAction("Login");
             }
-
+        
+           
             var hospitalEmail = HttpContext.Session.GetString("HospitalEmail");
-
-          
+        
+           
             var hospital = await _context.Hospitals.FirstOrDefaultAsync(h => h.Email == hospitalEmail);
-
-            if (hospital == null)
-            {
-                ModelState.AddModelError("", "Hospital not found.");
-                return View(new List<Appointment>()); 
-            }
-
-  
-            var today = DateTime.Today;
-            var appointmentsToday = await _context.Appointments
-                .Where(a => a.HospitalId == hospital.Id && a.Date.Date == today)
-                .Include(a => a.Doctor) 
-                .Include(a => a.Patient) 
-                .ToListAsync();
-
-            return View(appointmentsToday); 
+           
+        
+           
+            return View();
         }
 
+        [Authorize(AuthenticationSchemes = "PatientCookies")]
+        [HttpGet("Hospital/{HopitalId}/Doctors")]
+        public IActionResult Doctors(int HopitalId)
+        {
+            IEnumerable<Doctor> doctors = _hospitalRepository.GetDoctorByHospitalId(HopitalId);
+            Console.WriteLine("Inside Doctors");
 
-
+            for (int i = 0; i < doctors.Count(); i++)
+            {
+                Doctor doctor = doctors.ElementAt(i);
+                Console.WriteLine(doctor.FullName);  
+            }
+            DoctorsViewModel doctorsVM = new DoctorsViewModel();
+            doctorsVM._doctors = doctors;
+            doctorsVM._hospital = _hospitalRepository.GetHospitalById(HopitalId);
+            return View(doctorsVM);
+        }
+        
 
         public async Task<IActionResult> Details(int? id)
         {

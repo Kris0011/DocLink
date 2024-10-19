@@ -59,6 +59,17 @@ namespace DocLink.Controllers
             }
             return View(appointment);
         }
+        
+        
+        [HttpPost]
+        public IActionResult UpdateStatus(int id , string status)
+        {
+            var appointment = _context.Appointments.Find(id);
+            appointment.Status = status;
+            _context.Update(appointment);
+            _context.SaveChanges();
+            return RedirectToRoute("/Home/Index");
+        }
 
       
         public async Task<IActionResult> Edit(int? id)

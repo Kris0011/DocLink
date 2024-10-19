@@ -42,6 +42,14 @@ namespace DocLink
                    options.AccessDeniedPath = "/Home/AccessDenied";
                    options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
                });
+            
+            services.AddAuthentication("DoctorCookies")
+               .AddCookie("DoctorCookies", options =>
+               {
+                   options.LoginPath = "/Doctor/Login";
+                   options.AccessDeniedPath = "/Home/AccessDenied";
+                   options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+               });
 
             services.AddControllersWithViews();
             services.AddHttpContextAccessor();

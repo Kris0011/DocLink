@@ -1,0 +1,29 @@
+@model DocLink.ViewModel.DoctorsViewModel
+
+<h2 class="text-2xl font-bold mb-6">Doctors of @Model._hospital.Name</h2>
+
+<table class="min-w-full bg-white border border-gray-300 ">
+    <thead>
+    <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+        <th class="py-3 px-6 text-left">Doctor Name</th>
+        <th class="py-3 px-6 text-left">Specialization</th>
+        <th class="py-3 px-6 text-left">Contact</th>
+        <th class="py-3 px-6 text-center">Actions</th>
+    </tr>
+    </thead>
+    <tbody class="text-gray-600 text-sm font-light">
+    @foreach (var doctor in Model._doctors)
+    {
+        <tr class="border-b border-gray-200 hover:bg-gray-100">
+            <td class="py-3 px-6 text-left">@doctor.FullName</td>
+            <td class="py-3 px-6 text-left">@doctor.Specialization</td>
+            <td class="py-3 px-6 text-left">@doctor.PhoneNumber</td>
+            <td class="py-3 px-6 text-center">
+                <a asp-controller="Hospital" asp-action="">
+                    <button class="py-1 px-2 bg-blue-500 rounded-md text-white">More</button>
+                </a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

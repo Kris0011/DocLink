@@ -1,0 +1,73 @@
+@model DocLink.ViewModel.DoctorDashboardViewModel
+
+@{
+    ViewData["Title"] = "Doctor Dashboard";
+}
+
+<h2 class="text-2xl font-bold mb-4">Welcome, Dr. @Model.Doctor.FullName</h2>
+
+<div class="mb-8">
+    <h3 class="text-xl font-semibold">Doctor Information</h3>
+    <p><strong>Specialization:</strong> @Model.Doctor.Specialization</p>
+    <p><strong>Contact:</strong> @Model.Doctor.PhoneNumber</p>
+    <p><strong>Email:</strong> @Model.Doctor.DoctorEmail</p>
+</div>
+
+<div>
+    <h3 class="text-2xl font-semibold mb-4 text-white">Upcoming Appointments</h3>
+
+    @if (Model.Appointments.Any())
+    {
+        <table class="min-w-full border border-gray-300 shadow-md rounded-lg overflow-hidden">
+            <thead class="bg-blue-100">
+                <tr>
+                    <th class="border border-gray-300 px-4 py-2 text-left text-gray-800">Patient Name</th>
+                    <th class="border border-gray-300 px-4 py-2 text-left text-gray-800">Date</th>
+                    <th class="border border-gray-300 px-4 py-2 text-left text-gray-800">Time</th>
+                    <th class="border border-gray-300 px-4 py-2 text-left text-gray-800">Status</th>
+                    <th class="border border-gray-300 px-4 py-2 text-left text-gray-800">Notes</th>
+                    <th class="border border-gray-300 px-4 py-2 text-left text-gray-800">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var appointment in Model.Appointments)
+                {
+                    <tr>
+                        <td class="border border-gray-300 px-4 py-2 text-black-700">@appointment.Patient.FullName</td>
+                        <td class="border border-gray-300 px-4 py-2 text-black-700">@appointment.Date.ToString("MMMM dd, yyyy")</td>
+                        <td class="border border-gray-300 px-4 py-2 text-black-700">@appointment.Date.ToString("hh:mm tt")</td>
+                        <td class="border border-gray-300 px-4 py-2 text-black-700">
+                            @if (appointment.Status == "Pending")
+                            {
+                                <span class="text-yellow-600 font-semibold">@appointment.Status</span>
+                            }
+                            else if (appointment.Status == "Approved")
+                            {
+                                <span class="text-green-600 font-semibold">@appointment.Status</span>
+                            }
+                            else
+                            {
+                                <span class="text-red-600 font-semibold">@appointment.Status</span>
+                            }
+                        </td>
+                        <td class="border border-gray-300 px-4 py-2 text-black-700">@appointment.RescheduleMessage</td>
+                        <td class="border border-gray-300 px-4 py-2">
+                            @if (appointment.Status == "Pending")
+                            {
+                                <form asp-action="UpdateStatus" asp-controller="Appointment" method="post">
+                                    <input type="hidden" name="id" value="@appointment.Id" />
+                                    <input type="hidden" name="status" value="Approved" />
+                                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg">Approve</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p class="text-gray-600">No upcoming appointments.</p>
+    }
+</div>

@@ -1,18 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DocLink;
 using DocLink.Models;
+using DocLink.ViewModel;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 
 namespace DocLink.Controllers
 {
     public class DoctorController : Controller
     {
         private readonly DocLinkDbContext _context;
+        
+        private bool IsUserLoggedIn()
+        {
+            return HttpContext.Session.GetInt32("DoctorId") != null;
+        }
 
         public DoctorController(DocLinkDbContext context)
         {
@@ -20,10 +31,79 @@ namespace DocLink.Controllers
         }
 
      
+        [Authorize(AuthenticationSchemes = "DoctorCookies")]
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Doctors.ToListAsync());
+            if (!IsUserLoggedIn())
+            {
+                return RedirectToAction("Login");
+            }
+
+            return View();
+
         }
+        
+        [HttpGet]
+        public IActionResult Login()
+        {
+            if (IsUserLoggedIn())
+            {
+                return RedirectToAction("Dashboard", "Doctor");
+            }
+            return View();
+        }
+        
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(LoginViewModel model)
+        {
+            var doctor = await _context.Doctors.FirstOrDefaultAsync(d => d.DoctorEmail == model.Email && d.password == model.Password);
+            if (doctor != null)
+            {
+                HttpContext.Session.SetString("DoctorEmail", doctor.DoctorEmail);
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, doctor.DoctorEmail) ,
+                    new Claim("DoctorId", doctor.Id.ToString())
+                };
+                
+                var claimsIdentity = new ClaimsIdentity(claims, "DoctorCookies");
+                await HttpContext.SignInAsync("DoctorCookies", new ClaimsPrincipal(claimsIdentity));
+                
+                HttpContext.Session.SetInt32("DoctorId", doctor.Id);  
+                return RedirectToAction("Dashboard", "Doctor");
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+            }
+            return View(model);
+        }
+        
+        [HttpGet]
+        [Authorize(AuthenticationSchemes = "DoctorCookies")]
+        public  IActionResult Dashboard()
+        {
+            if (!IsUserLoggedIn())
+            {
+                return RedirectToAction("Login");
+            }
+            var doctorId = HttpContext.Session.GetInt32("DoctorId");
+            var doctor = _context.Doctors.Find(doctorId);
+            var appointments = _context.Appointments
+                .Include(a => a.Patient)
+                .Where(a => a.DoctorId == doctorId && a.Patient != null)
+                .ToList();
+
+            
+            var viewModel = new DoctorDashboardViewModel(doctor, appointments);
+            
+            return View(viewModel);
+        }
+        
+        
+        
+        
 
       
         public async Task<IActionResult> Details(int? id)

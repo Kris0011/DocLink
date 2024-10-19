@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DocLink.Migrations
 {
     [DbContext(typeof(DocLinkDbContext))]
-    [Migration("20241018202834_initcreate")]
-    partial class initcreate
+    [Migration("20241019030459_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
