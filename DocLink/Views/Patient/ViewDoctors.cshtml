@@ -1,0 +1,31 @@
+﻿@model IEnumerable<DocLink.Models.Doctor>
+
+@{
+    ViewData["Title"] = "Doctors at " + ViewBag.HospitalName;
+}
+
+<h2 class="text-2xl font-bold mb-4 text-white">Doctors at @ViewBag.HospitalName</h2>
+
+<table class="min-w-full border border-gray-300 shadow-md rounded-lg overflow-hidden">
+    <thead class="bg-green-800">
+        <tr>
+            <th class="border border-gray-300 px-4 py-2 text-left text-white">Doctor Name</th>
+            <th class="border border-gray-300 px-4 py-2 text-left text-white">Specialization</th>
+            <th class="border border-gray-300 px-4 py-2 text-left text-white">Appointment</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var doctor in Model)
+        {
+            <tr>
+                <td class="border border-gray-300 px-4 py-2 text-white">@doctor.FullName</td>
+                <td class="border border-gray-300 px-4 py-2 text-white">@doctor.Specialization</td>
+                <td class="border border-gray-300 px-4 py-2">
+                    <form method="post" action="@Url.Action("BookAppointment", "Patient", new { doctorId = doctor.Id })">
+                        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200">Book Appointment</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

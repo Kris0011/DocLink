@@ -18,7 +18,7 @@ namespace DocLink.Models
         public int DoctorId { get; set; }
         public Doctor Doctor { get; set; }
 
-        
+    
         public int HospitalId { get; set; }
         public Hospital Hospital { get; set; }
 
@@ -28,6 +28,12 @@ namespace DocLink.Models
         [Required] 
         public string Status { get; set; }
 
-        public string RescheduleMessage { get; set; } 
+        public string RescheduleMessage { get; set; }
+
+           [Required]
+         public TimeSpan Time { get; set; }
+
     }
 }
+
+

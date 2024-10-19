@@ -1,36 +1,142 @@
-﻿@model DocLink.ViewModel.ScheduleAppointmentViewModel
+﻿@model IEnumerable<object>
 
-<h2>Search for Doctors</h2>
+@{
+    ViewData["Title"] = "Schedule an Appointment";
+    string filterType = ViewBag.FilterType as string;
+}
 
-<form asp-action="SearchAppointments" method="post">
-    <div>
-        <label>Select Hospital:</label>
-        <select asp-for="HospitalId" asp-items="ViewBag.Hospitals">
-            <option value="0">All Hospitals</option> 
-        </select>
-    </div>
+<h2 class="text-2xl font-semibold mb-4 text-white">Schedule an Appointment</h2>
 
-    <div>
-        <label>Search Doctor:</label>
-        <input type="text" asp-for="DoctorName" placeholder="Enter doctor's name" />
-    </div>
 
-    <button type="submit">Search</button>
-</form>
 
-<hr />
-
-@if (Model.DoctorList != null && Model.DoctorList.Any())
-{
-    <h3>Available Doctors</h3>
-    <ul>
-        @foreach (var doctor in Model.DoctorList)
+<!-- Filter dropdown -->
+<div class="mb-6">
+    <label for="filter" class="mr-2 text-lg">Filter by:</label>
+    <select id="filter" name="filter" onchange="location.href='@Url.Action("ScheduleAppointment", "Patient")?filter=' + this.value;" class="border border-gray-400 rounded-md p-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+        @if (filterType == "Doctor")
         {
-            <li>@doctor.Name (@doctor.HospitalName)</li>
+            <option value="Doctor" selected="selected">Doctor</option>
+            <option value="Hospital">Hospital</option>
         }
-    </ul>
-}
-else if (Model.DoctorList != null) 
+        else
+        {
+            <option value="Doctor">Doctor</option>
+            <option value="Hospital" selected="selected">Hospital</option>
+        }
+    </select>
+</div>
+
+<!-- Display results based on the filter -->
+@if (filterType == "Doctor")
 {
-    <p>No doctors found for the selected hospital and search criteria.</p>
+    <h3 class="text-2xl font-semibold mb-4 text-white">Doctors</h3>
+
+    <table class="min-w-full border border-gray-300 shadow-md rounded-lg overflow-hidden">
+        <thead class="bg-blue-100">
+            <tr>
+                <th class="border border-gray-300 px-4 py-2 text-left text-gray-800">Doctor Name</th>
+                <th class="border border-gray-300 px-4 py-2 text-left text-gray-800">Specialization</th>
+                <th class="border border-gray-300 px-4 py-2 text-left text-gray-800">Phone Number</th>
+                <th class="border border-gray-300 px-4 py-2 text-left text-gray-800">Hospital Name</th>
+                <th class="border border-gray-300 px-4 py-2 text-left text-gray-800">Hospital Address</th>
+                <th class="border border-gray-300 px-4 py-2 text-left text-gray-800">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var doctor in Model.Cast<DocLink.Models.Doctor>())
+            {
+                <tr>
+                    <td class="border border-gray-300 px-4 py-2 text-black-700">@doctor.FullName</td>
+                    <td class="border border-gray-300 px-4 py-2 text-black-700">@doctor.Specialization</td>
+                    <td class="border border-gray-300 px-4 py-2 text-black-700">@doctor.PhoneNumber</td>
+                    <td class="border border-gray-300 px-4 py-2 text-black-700">@doctor.Hospital.Name</td> <!-- Accessing Hospital Name -->
+                    <td class="border border-gray-300 px-4 py-2 text-black-700">@doctor.Hospital.Address</td> <!-- Accessing Hospital Address -->
+                    <td class="border border-gray-300 px-4 py-2">
+                        <form method="post" action="@Url.Action("BookAppointment", "Patient", new { doctorId = doctor.Id })">
+                            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg">Book Appointment</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 }
+
+
+else
+{
+
+    <h3 class="text-2xl font-semibold mb-4 text-white">Hospitals</h3>
+
+    <table class="min-w-full border border-gray-300 shadow-md rounded-lg overflow-hidden">
+        <thead class="bg-green-100">
+            <tr>
+                <th class="border border-gray-300 px-4 py-2 text-left text-gray-800">Hospital Name</th>
+                <th class="border border-gray-300 px-4 py-2 text-left text-gray-800">Address</th>
+                <th class="border border-gray-300 px-4 py-2 text-left text-gray-800">Phone Number</th>
+                <th class="border border-gray-300 px-4 py-2 text-left text-gray-800">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var hospital in Model.Cast<DocLink.Models.Hospital>())
+            {
+                <tr>
+                    <td class="border border-gray-300 px-4 py-2 text-black-800">@hospital.Name</td>
+                    <td class="border border-gray-300 px-4 py-2 text-black-800">@hospital.Address</td>
+                    <td class="border border-gray-300 px-4 py-2 text-black-700">@hospital.Phone</td>
+                    <td class="border border-gray-300 px-4 py-2">
+                        <form method="get" action="@Url.Action("ViewDoctors", "Patient")">
+                            <input type="hidden" name="hospitalId" value="@hospital.Id" /> 
+                            <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors duration-200">View Doctors</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    
+
+}
+
+
+              
+                    
+
+
+
+@*
+else
+{
+    <h3 class="text-2xl font-semibold mb-4 text-white">Hospitals</h3>
+
+
+    <table class="min-w-full border border-gray-300 shadow-md rounded-lg overflow-hidden">
+        <thead class="bg-green-100">
+            <tr>
+                <th class="border border-gray-300 px-4 py-2 text-left text-gray-800">Hospital Name</th>
+                <th class="border border-gray-300 px-4 py-2 text-left text-gray-800">Address</th>
+                <th class="border border-gray-300 px-4 py-2 text-left text-gray-800">Phone Number</th>
+                <th class="border border-gray-300 px-4 py-2 text-left text-gray-800">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var hospital in Model.Cast<DocLink.Models.Hospital>())
+            {
+                <tr>
+                    <td class="border border-gray-300 px-4 py-2 text-black-800">@hospital.Name</td>
+                    <td class="border border-gray-300 px-4 py-2 text-black-800">@hospital.Address</td>
+                    <td class="border border-gray-300 px-4 py-2 text-black-700">@hospital.Phone</td>
+                    <td class="border border-gray-300 px-4 py-2">
+                        <form method="get" action="@Url.Action("ViewDoctors", "Patient", new { hospitalId = hospital.Id })">
+                            <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors duration-200">View Doctors</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+
+*@
