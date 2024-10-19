@@ -57,14 +57,6 @@ namespace DocLink.Controllers
             return View(appointments);  
         }
 
-/*      
-        public IActionResult ScheduleAppointment()
-        {
-           
-            return View(); 
-        }
-*/
-
         [Authorize(AuthenticationSchemes = "PatientCookies")]
         public async Task<IActionResult> Index()
         {
