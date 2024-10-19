@@ -3,6 +3,7 @@ using System;
 using DocLink;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
@@ -11,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DocLink.Migrations
 {
     [DbContext(typeof(DocLinkDbContext))]
-    [Migration("20241017044647_Initial")]
-    partial class Initial
+    [Migration("20241018202834_initcreate")]
+    partial class initcreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -22,11 +23,15 @@ namespace DocLink.Migrations
                 .HasAnnotation("ProductVersion", "8.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
+            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
+
             modelBuilder.Entity("DocLink.Models.Appointment", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime(6)");
@@ -51,6 +56,9 @@ namespace DocLink.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<TimeSpan>("Time")
+                        .HasColumnType("time(6)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("DoctorId");
@@ -68,6 +76,12 @@ namespace DocLink.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("DoctorEmail")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -76,10 +90,18 @@ namespace DocLink.Migrations
                     b.Property<int>("HospitalId")
                         .HasColumnType("int");
 
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<string>("Specialization")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
+
+                    b.Property<string>("password")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -93,6 +115,8 @@ namespace DocLink.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Address")
                         .IsRequired()
@@ -124,6 +148,8 @@ namespace DocLink.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Address")
                         .HasMaxLength(100)

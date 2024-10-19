@@ -1,6 +1,8 @@
-﻿@{
-    Layout = "_Layout";
+﻿
+@{
 }
+
+
 
 @model DocLink.Models.Appointment 
 
@@ -8,17 +10,10 @@
     ViewData["Title"] = "Book Appointment";
 }
 
-@if (ViewBag.Doctor != null)
-{
-    <h2 class="text-2xl font-semibold mb-4">Book Appointment with @ViewBag.Doctor.FullName</h2>
-}
-else
-{
-    <h2 class="text-2xl font-semibold mb-4">Doctor not found</h2>
-}
+<h2 class="text-2xl font-semibold mb-4">Book Appointment with @ViewBag.Doctor.FullName</h2>
 
-<form method="post" action="@Url.Action("BookAppointment", "Patient")">
-    <input type="hidden" name="DoctorId" value="@ViewBag.Doctor?.Id" />
+<form method="post" action="@Url.Action("CreateAppointment", "Patient")">
+    <input type="hidden" name="DoctorId" value="@ViewBag.Doctor.Id" />
 
     <div class="mb-4">
         <label for="subject" class="block text-lg">Subject:</label>
@@ -30,10 +25,11 @@ else
         <input type="date" id="date" name="Date" required class="border border-gray-400 rounded-md p-2 w-full" min="@DateTime.Now.ToString("yyyy-MM-dd")" />
     </div>
 
-    <div class="mb-4">
+   <div class="mb-4">
         <label for="time" class="block text-lg">Time:</label>
         <input type="time" id="time" name="Time" required class="border border-gray-400 rounded-md p-2 w-full" />
     </div>
+  
 
     <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200">Submit</button>
 </form>

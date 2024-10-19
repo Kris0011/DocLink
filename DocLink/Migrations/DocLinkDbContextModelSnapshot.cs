@@ -53,6 +53,9 @@ namespace DocLink.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<TimeSpan>("Time")
+                        .HasColumnType("time(6)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("DoctorId");

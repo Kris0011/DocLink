@@ -14,8 +14,8 @@ namespace DocLink.ViewModel
             [DataType(DataType.Password)]
             public string Password { get; set; }
             
-            [Required]
-            public string Role { get; set; }
+         //         [Required]
+         //     public string Role { get; set; }
             
         }
     

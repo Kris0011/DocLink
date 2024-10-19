@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace DocLink.Controllers
 {
@@ -56,19 +57,13 @@ namespace DocLink.Controllers
             return View(appointments);  
         }
 
-      
+/*      
         public IActionResult ScheduleAppointment()
         {
-            if (!IsUserLoggedIn())
-            {
-                return RedirectToAction("Login");
-            }
-
-            ViewBag.Hospitals = new SelectList(_context.Hospitals, "Id", "Name");
-            ViewBag.Doctors = new SelectList(_context.Doctors, "Id", "FullName");
+           
             return View(); 
         }
-
+*/
 
         [Authorize(AuthenticationSchemes = "PatientCookies")]
         public async Task<IActionResult> Index()
@@ -325,57 +320,146 @@ namespace DocLink.Controllers
             return _context.Patients.Any(e => e.Id == id);
         }
 
+        /*     public ActionResult ScheduleAppointment(string filter)
+             {
+                 // Set the filter type in ViewBag
+                 ViewBag.FilterType = string.IsNullOrEmpty(filter) ? "Doctor" : filter;
 
+                 IEnumerable<object> model;
 
-      /*  public IActionResult ScheduleAppointments()
+                 // Fetch data based on filter
+                 if (ViewBag.FilterType == "Doctor")
+                 {
+                     // Fetch the list of doctors from your database or service
+                     // For example:
+                     var doctors = _context.Doctors.ToList(); // Replace with your actual data source
+                     model = doctors;
+                 }
+                 else
+                 {
+                     // Fetch the list of hospitals from your database or service
+                     var hospitals = _context.Hospitals.ToList(); // Replace with your actual data source
+                     model = hospitals;
+                 }
+
+                 // Pass the model to the view
+                 return View(model);
+             }
+
+             */
+
+        public ActionResult ScheduleAppointment(string filter)
         {
-            var model = new ScheduleAppointmentViewModel();
-            ViewBag.Hospitals = new SelectList(_context.Hospitals, "Id", "Name");
-            ViewBag.Doctors = new SelectList(_context.Doctors, "Id", "FullName");
+            // Set the filter type in ViewBag
+            ViewBag.FilterType = string.IsNullOrEmpty(filter) ? "Doctor" : filter;
 
+            IEnumerable<object> model;
+
+            if (ViewBag.FilterType == "Doctor")
+            {
+                // Fetch the list of doctors along with their hospital data
+                var doctors = _context.Doctors
+                    .Include(d => d.Hospital) // This includes Hospital data based on HospitalId
+                    .ToList();
+
+                model = doctors;
+            }
+            else
+            {
+                // Fetch the list of hospitals
+                var hospitals = _context.Hospitals.ToList();
+                model = hospitals;
+            }
+
+            // Pass the model to the view
             return View(model);
         }
 
-        [HttpPost]
-        public IActionResult SearchAppointments(ScheduleAppointmentViewModel model)
+
+        public IActionResult ViewDoctors(int hospitalId)
         {
-            // Initialize DoctorList to prevent null reference
-            model.DoctorList = new List<DoctorViewModel>();
+            // Fetch doctors associated with the given hospital ID
+            var doctors = _context.Doctors.Where(d => d.HospitalId == hospitalId).ToList();
 
-            if (ModelState.IsValid)
-            {
-                // Build the query for doctors based on the hospital and name
-                var doctors = _context.Doctors.AsQueryable();
+            // Optional: Fetch the hospital name for display
+            ViewBag.HospitalName = _context.Hospitals.FirstOrDefault(h => h.Id == hospitalId)?.Name;
 
-                if (model.HospitalId != 0) // Assuming 0 means 'All Hospitals'
-                {
-                    doctors = doctors.Where(d => d.HospitalId == model.HospitalId);
-                }
-
-                // Filtering by DoctorName if it has a value
-                if (!string.IsNullOrEmpty(model.DoctorName))
-                {
-                    doctors = doctors.Where(d => d.FullName.Contains(model.DoctorName));
-                }
-
-                // Populate the DoctorList with the filtered results
-                model.DoctorList = doctors.Select(d => new DoctorViewModel
-                {
-                    Id = d.Id,
-                    Name = d.FullName,
-                    HospitalName = d.Hospital.Name // Ensure this navigation property exists
-                }).ToList();
-            }
-
-          
-            ViewBag.Hospitals = new SelectList(_context.Hospitals, "Id", "Name", model.HospitalId);
-            ViewBag.Doctors = new SelectList(_context.Doctors, "Id", "FullName", model.DoctorId);
-
-          
-            return View("ScheduleAppointments", model);
+            return View(doctors);
         }
 
-        */
+
+        [HttpPost]
+        public IActionResult BookAppointment(int doctorId)
+        {
+            // Ensure the doctor exists
+            var doctor = _context.Doctors.Find(doctorId);
+
+            // Check if the doctor was found
+            if (doctor == null)
+            {
+                // Optionally, handle the case where the doctor is not found
+                return NotFound(); // or redirect to an error page
+            }
+
+            ViewBag.Doctor = doctor; // Pass the doctor object to the view
+            return View();
+        }
+
+
+        [HttpPost]
+        public IActionResult CreateAppointment(Appointment appointment)
+        {
+           
+          
+
+           
+                var doctor = _context.Doctors.Find(appointment.DoctorId);
+                if (doctor == null)
+                {
+                    ModelState.AddModelError("", "Selected doctor not found.");
+                    return View("BookAppointment", appointment); 
+                }
+
+                
+                int? patientId = HttpContext.Session.GetInt32("PatientId");
+                if (patientId == null)
+                {
+                    ModelState.AddModelError("", "Patient not logged in.");
+                    return View("BookAppointment", appointment);
+                }
+           
+                appointment.PatientId = (int)patientId; 
+                appointment.HospitalId = doctor.HospitalId; 
+                appointment.Status = "Pending"; 
+                appointment.RescheduleMessage = "Doctor needs to confirm this appointment."; 
+
+                try
+                {
+                  
+                    _context.Appointments.Add(appointment);
+                    _context.SaveChanges();
+
+                   
+                    return RedirectToAction("Index", "Home");
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", $"An error occurred: {ex.Message}");
+                }
+           
+          
+            
+            return View("BookAppointment", appointment);
+        }
+
+
+
+
+
+
+
+
+
 
 
     }

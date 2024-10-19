@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authentication;
 using System.Collections.Generic;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using System;
 
 
 
@@ -145,13 +146,12 @@ namespace DocLink.Controllers
 
         public async Task<IActionResult> Logout()
         {
-            // Sign out the user from the authentication scheme
+           
             await HttpContext.SignOutAsync("HospitalCookies");
 
-            // Clear the session
             HttpContext.Session.Clear();
 
-            // Redirect to the Login page
+          
             return RedirectToAction("Login");
         }
 
@@ -163,18 +163,31 @@ namespace DocLink.Controllers
             {
                 return RedirectToAction("Login");
             }
-        
-           
+
             var hospitalEmail = HttpContext.Session.GetString("HospitalEmail");
-        
-           
+
+          
             var hospital = await _context.Hospitals.FirstOrDefaultAsync(h => h.Email == hospitalEmail);
-           
-        
-           
-            return View();
+
+            if (hospital == null)
+            {
+                ModelState.AddModelError("", "Hospital not found.");
+                return View(new List<Appointment>()); 
+            }
+
+  
+            var today = DateTime.Today;
+            var appointmentsToday = await _context.Appointments
+                .Where(a => a.HospitalId == hospital.Id && a.Date.Date == today)
+                .Include(a => a.Doctor) 
+                .Include(a => a.Patient) 
+                .ToListAsync();
+
+            return View(appointmentsToday); 
         }
-        
+
+
+
 
         public async Task<IActionResult> Details(int? id)
         {
