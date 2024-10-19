@@ -35,8 +35,10 @@ namespace DocLink.Controllers
             {
                 return RedirectToAction("Login");
             }
+            
+            Patient patient = _context.Patients.Find(HttpContext.Session.GetInt32("PatientId"));
 
-            return View();  
+            return View(patient);  
         }
 
       

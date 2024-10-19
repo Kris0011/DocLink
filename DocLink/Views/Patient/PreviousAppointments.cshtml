@@ -1,21 +1,42 @@
 ﻿@model IEnumerable<DocLink.Models.Appointment>
 
-<h2>Your Previous Appointments</h2>
+@{
+    ViewData["Title"] = "Your Previous Appointments";
+}
 
-<table>
+<h2 class="text-2xl font-bold mb-4">Your Previous Appointments</h2>
+
+<table class="min-w-full border border-gray-300 shadow-md rounded-lg overflow-hidden">
+    <thead class="bg-blue-100">
     <tr>
-        <th>Doctor</th>
-        <th>Hospital</th>
-        <th>Date</th>
-        <th>Status</th>
+        <th class="border border-gray-300 px-4 py-2 text-left text-gray-800">Doctor</th>
+        <th class="border border-gray-300 px-4 py-2 text-left text-gray-800">Hospital</th>
+        <th class="border border-gray-300 px-4 py-2 text-left text-gray-800">Date</th>
+        <th class="border border-gray-300 px-4 py-2 text-left text-gray-800">Status</th>
     </tr>
+    </thead>
+    <tbody>
     @foreach (var appointment in Model)
     {
-        <tr>
-            <td>@appointment.Doctor.FullName</td>
-            <td>@appointment.Hospital.Name</td>
-            <td>@appointment.Date.ToShortDateString()</td>
-            <td>@appointment.Status</td>
+        <tr class="border-t">
+            <td class="border border-gray-300 px-4 py-2 text-black-700">@appointment.Doctor.FullName</td>
+            <td class="border border-gray-300 px-4 py-2 text-black-700">@appointment.Hospital.Name</td>
+            <td class="border border-gray-300 px-4 py-2 text-black-700">@appointment.Date.ToString("MMMM dd, yyyy")</td>
+            <td class="border border-gray-300 px-4 py-2 text-black-700">
+                @if (appointment.Status == "Pending")
+                {
+                    <span class="text-yellow-600 font-semibold">@appointment.Status</span>
+                }
+                else if (appointment.Status == "Approved")
+                {
+                    <span class="text-green-600 font-semibold">@appointment.Status</span>
+                }
+                else
+                {
+                    <span class="text-red-600 font-semibold">@appointment.Status</span>
+                }
+            </td>
         </tr>
     }
+    </tbody>
 </table>

@@ -1,10 +1,30 @@
-﻿@{
+﻿@model Patient
+@{
     ViewData["Title"] = "Patient Dashboard";
 }
 
-<h2>Welcome to your Dashboard</h2>
+<h2 class="text-2xl font-bold mb-6">Welcome, @Model.FullName!</h2>
 
-<div>
-    <button onclick="location.href='@Url.Action("PreviousAppointments", "Patient")'">Previous Appointments</button>
-    <button onclick="location.href='@Url.Action("ScheduleAppointment", "Patient")'">Schedule Appointment</button>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-10 text-black">
+    
+    <div class="p-4 bg-white rounded-lg shadow-md">
+        <h3 class="text-lg font-semibold mb-3">Appointments</h3>
+        <button onclick="location.href='@Url.Action("PreviousAppointments", "Patient")'" class="btn btn-accent w-full mb-2">View Previous Appointments</button>
+        <button onclick="location.href='@Url.Action("ScheduleAppointment", "Patient")'" class="btn btn-primary w-full">Schedule New Appointment</button>
+    </div>
+
+    
+    <div class="p-4 bg-white rounded-lg shadow-md">
+        <h3 class="text-lg font-semibold mb-3">Account Settings</h3>
+        <button class="btn btn-outline w-full mb-2" onclick="location.href='@Url.Action("EditProfile", "Patient")'">Edit Profile</button>
+        <button class="btn btn-danger w-full" onclick="location.href='@Url.Action("Logout", "Account")'">Logout</button>
+    </div>
+</div>
+
+
+<div class="mt-10 p-6  rounded-lg">
+    <h3 class="text-lg font-semibold mb-3">Health Tips</h3>
+    <p>Stay hydrated and get enough sleep to boost your immunity.</p>
+    <p>Regularly check your vitals and schedule health check-ups.</p>
+    <button class="btn btn-secondary mt-3" onclick="location.href='@Url.Action("HealthTips", "Patient")'">More Health Tips</button>
 </div>
