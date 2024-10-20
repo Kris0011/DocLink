@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DocLink;
 using DocLink.Models;
+using DocLink.Repository;
 
 namespace DocLink.Controllers
 {
@@ -66,9 +67,10 @@ namespace DocLink.Controllers
         {
             var appointment = _context.Appointments.Find(id);
             appointment.Status = status;
+            appointment.RescheduleMessage = "Your Appointment Has Been Confirmed!";
             _context.Update(appointment);
             _context.SaveChanges();
-            return RedirectToRoute("/Home/Index");
+            return RedirectToAction("Dashboard","Doctor");
         }
 
       

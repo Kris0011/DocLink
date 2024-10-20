@@ -54,8 +54,8 @@ namespace DocLink
             services.AddControllersWithViews();
             services.AddHttpContextAccessor();
             services.AddRazorPages();
-            services.AddScoped<IAppointmentRepository, AppointmentRepository>();
-            services.AddScoped<IHospitalRepository, HospitalRepository>();
+            services.AddTransient<IAppointmentRepository, AppointmentRepository>();
+            services.AddTransient<IHospitalRepository, HospitalRepository>();
 
             services.AddDbContext<DocLinkDbContext>(options =>
                 options.UseMySql(Configuration.GetConnectionString("DocLink"), new MySqlServerVersion(new Version(8, 0, 21))));

@@ -28,14 +28,16 @@
             @inject IAuthenticationService authService
 
             @{
-            // Check if the user is logged in as a hospital or patient
-            var hospitalAuthResult = await authService.AuthenticateAsync(Context, "HospitalCookies");
-            var patientAuthResult = await authService.AuthenticateAsync(Context, "PatientCookies");
+                // Check if the user is logged in as a hospital or patient
+                var hospitalAuthResult = await authService.AuthenticateAsync(Context, "HospitalCookies");
+                var patientAuthResult = await authService.AuthenticateAsync(Context, "PatientCookies");
+                var doctorAuthResult = await authService.AuthenticateAsync(Context, "DoctorCookies");
 
-            var hospitalClaim = hospitalAuthResult.Principal?.FindFirst("HospitalId");
-            var patientClaim = patientAuthResult.Principal?.FindFirst("PatientId");
+                var hospitalClaim = hospitalAuthResult.Principal?.FindFirst("HospitalId");
+                var patientClaim = patientAuthResult.Principal?.FindFirst("PatientId");
+                var doctorClaim = doctorAuthResult.Principal?.FindFirst("DoctorId");
 
-            bool isAuthenticated = hospitalClaim != null || patientClaim != null;
+            bool isAuthenticated = hospitalClaim != null || patientClaim != null || doctorClaim!=null;
             }
 
             @if (isAuthenticated)
@@ -54,6 +56,7 @@
 
                     @if (hospitalClaim != null)
                     {
+                            <li><a asp-controller="Hospital" asp-action="Index">Dashboard</a></li>
                     <li>
                         <form asp-controller="Hospital" asp-action="Logout" method="post">
                             <button type="submit" class="btn btn-link">Logout (Hospital)</button>
@@ -69,6 +72,15 @@
                         </form>
                     </li>
                     }
+                        else if (doctorClaim != null)
+                        {
+                            <li><a asp-controller="Doctor" asp-action="Dashboard">Dashboard</a></li>
+                            <li>
+                                <form asp-controller="Doctor" asp-action="Logout" method="post">
+                                    <button type="submit" class="btn btn-link">Logout (Doctor)</button>
+                                </form>
+                            </li>
+                        }
                 </ul>
             </div>
             }

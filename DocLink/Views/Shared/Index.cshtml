@@ -19,26 +19,53 @@
             Whether you're a patient, doctor, or hospital, DocLink simplifies healthcare communication and management, ensuring faster, secure, and more accessible care.
         </p>
 
-       
+        @using Microsoft.AspNetCore.Authentication
+        @inject IAuthenticationService authService
+
+        @{
+            // Check if the user is logged in as a hospital or patient
+            var hospitalAuthResult = await authService.AuthenticateAsync(Context, "HospitalCookies");
+            var patientAuthResult = await authService.AuthenticateAsync(Context, "PatientCookies");
+            var doctorAuthResult = await authService.AuthenticateAsync(Context, "DoctorCookies");
+
+            var hospitalClaim = hospitalAuthResult.Principal?.FindFirst("HospitalId");
+            var patientClaim = patientAuthResult.Principal?.FindFirst("PatientId");
+            var doctorClaim = doctorAuthResult.Principal?.FindFirst("DoctorId");
+
+            bool isAuthenticated = hospitalClaim != null || patientClaim != null || doctorClaim != null;
+        }
+
+
+
         <div class="p-2  w-full max-w-lg mx-auto">
+
+
             <p class="text-lg font-semibold mb-6 text-gray-200">Who are you?</p>
             <div class="flex justify-center items-center space-x-4">
                 <a href="Patient/Login">
-                    <button class="btn bg-blue-600 text-white text-lg font-medium rounded-full hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-105">
-                        Patient
-                    </button>
+
+                  
+                        <button class="btn bg-blue-600 text-white text-lg font-medium rounded-full hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-105">
+                            Patient
+                        </button>
+                    
                 </a>
-                <a href="Doctor/Login">
-                    <button class="btn bg-green-600 text-white text-lg font-medium rounded-full hover:bg-green-700 transition duration-300 ease-in-out transform hover:scale-105">
-                        Doctor
-                    </button>
+                <a asp-controller="Doctor" asp-action="Login">
+                   
+                        <button class="btn bg-green-600 text-white text-lg font-medium rounded-full hover:bg-green-700 transition duration-300 ease-in-out transform hover:scale-105">
+                            Doctor
+                        </button>
+                    
                 </a>
-                <a href="Hospital/Login">
-                    <button class="btn bg-indigo-600 text-white  text-lg font-medium rounded-full hover:bg-indigo-700 transition duration-300 ease-in-out transform hover:scale-105">
-                        Hospital
-                    </button>
+                <a asp-controller="Hospital" asp-action="Login">
+                    
+                        <button class="btn bg-indigo-600 text-white  text-lg font-medium rounded-full hover:bg-indigo-700 transition duration-300 ease-in-out transform hover:scale-105">
+                            Hospital
+                        </button>
+                   
                 </a>
             </div>
+
         </div>
     </div>
 

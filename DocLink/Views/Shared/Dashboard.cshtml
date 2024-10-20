@@ -16,8 +16,12 @@
     
     <div class="p-4 bg-white rounded-lg shadow-md">
         <h3 class="text-lg font-semibold mb-3">Account Settings</h3>
-        <button class="btn btn-outline w-full mb-2" onclick="location.href='@Url.Action("EditProfile", "Patient")'">Edit Profile</button>
-        <button class="btn btn-danger w-full" onclick="location.href='@Url.Action("Logout", "Account")'">Logout</button>
+        <button class="btn btn-outline w-full mb-2" onclick="location.href='@Url.Action("Edit", "Patient")'">Edit Profile</button>
+        <button class="btn btn-danger w-full" onclick="location.href='@Url.Action("Logout", "Patient")'">Logout</button>
+
+        <button class="btn btn-outline w-full mb-2" onclick="location.href='@Url.Action("Dashboard", "Patient")'">Edit Profile</button>
+        <button class="btn btn-danger w-full" onclick="location.href='@Url.Action("Edit", "Patient")'">Logout</button>
+
     </div>
 </div>
 

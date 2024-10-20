@@ -42,17 +42,28 @@ namespace DocLink.Controllers
             return View();
 
         }
-        
+
         [HttpGet]
         public IActionResult Login()
         {
-            if (IsUserLoggedIn())
+            if (HttpContext.Session.GetInt32("PatientId") != null)
             {
-                return RedirectToAction("Dashboard", "Doctor");
+                return RedirectToAction("Dashboard", "Patient");
             }
+            if (HttpContext.Session.GetInt32("HospitalEmail") != null)
+            {
+                return RedirectToAction("Index", "Hospital");
+
+
+            }
+            if (HttpContext.Session.GetInt32("DoctorId") != null)
+            {
+                return RedirectToAction("DashBoard", "Doctor");
+            }
+
             return View();
         }
-        
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
@@ -79,7 +90,22 @@ namespace DocLink.Controllers
             }
             return View(model);
         }
-        
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync("DoctorCookies");
+
+
+            HttpContext.Session.Clear();
+
+
+            return RedirectToAction("Login");
+        }
+
         [HttpGet]
         [Authorize(AuthenticationSchemes = "DoctorCookies")]
         public  IActionResult Dashboard()

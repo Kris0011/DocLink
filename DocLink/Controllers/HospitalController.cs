@@ -102,18 +102,32 @@ namespace DocLink.Controllers
             return View(hospital);
         }
 
-       
+
 
         [HttpGet]
         public IActionResult Login()
         {
-            return View();
+            if(HttpContext.Session.GetInt32("PatientId") != null)
+            {
+                return RedirectToAction("Dashboard", "Patient");
+            }
+            if(HttpContext.Session.GetInt32("HospitalEmail") !=null)
+            {
+                return RedirectToAction("Index", "Hospital");
+
+
+            }
+            if(HttpContext.Session.GetInt32("DoctorId") != null)
+            {
+                return RedirectToAction("DashBoard", "Doctor");
+            }
+
+                return View();
         }
 
-       
 
 
-         [HttpPost]
+        [HttpPost]
          [ValidateAntiForgeryToken]
          public async Task<IActionResult> Login(string email, string password)
          {

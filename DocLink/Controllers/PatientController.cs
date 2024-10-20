@@ -91,9 +91,18 @@ namespace DocLink.Controllers
         [HttpGet]
         public IActionResult Login()
         {
-            if (IsUserLoggedIn())
+            if (HttpContext.Session.GetInt32("PatientId") != null)
             {
                 return RedirectToAction("Dashboard", "Patient");
+            }
+
+            if(HttpContext.Session.GetInt32("DoctorId") != null)
+            {
+                return RedirectToAction("DashBoard", "Doctor");
+            }
+            if(HttpContext.Session.GetInt32("HospitalEmail") != null)
+            {
+                return RedirectToAction("Index", "Hospital");
             }
             return View();
         }
@@ -132,7 +141,11 @@ namespace DocLink.Controllers
                     ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                 }
             }
+
+            
+          
             return View(model);
+            
         }
 
 
@@ -140,8 +153,7 @@ namespace DocLink.Controllers
 
         
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize]
+       
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync("PatientCookies");
@@ -150,7 +162,7 @@ namespace DocLink.Controllers
             HttpContext.Session.Clear();
 
           
-            return RedirectToAction("Login");
+            return RedirectToAction("Login","Patient");
         }
 
 
@@ -232,7 +244,6 @@ namespace DocLink.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,FullName,Email,Password,Address,PhoneNumber,Gender,Age")] Patient patient)
         {
             if (!IsUserLoggedIn())
